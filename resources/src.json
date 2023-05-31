@@ -1,0 +1,10 @@
+{
+  "version": "1.2.0",
+  "fetcher": "fetchFromGitHub",
+  "args": {
+    "hash": "sha256-x9BrU5hj6HsnRudt7a7qEJOTX2WU1UdAxiPK40NLvew=",
+    "owner": "babashka",
+    "repo": "babashka",
+    "rev": "v1.2.0"
+  }
+}
