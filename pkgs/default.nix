@@ -1,8 +1,13 @@
-{ lib, babashka, nurl, writeShellScript }:
+{ lib
+, babashka
+, nurl
+, writeShellScript
+, coreutils
+}:
 
 let
   bb-script = ../src/updater.clj;
-  runtimeInputs = [ babashka nurl ];
+  runtimeInputs = [ babashka nurl coreutils ];
 in
 
 writeShellScript
