@@ -3,28 +3,32 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = { self, nixpkgs, ... }:
 
-      imports =
+    let
+      inherit (nixpkgs.lib) genAttrs;
+
+      eachSystem = f: genAttrs
         [
-          flake-parts.flakeModules.easyOverlay
-        ];
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
+          "aarch64-darwin"
+          "x86_64-linux"
+        ]
+        (system: f nixpkgs.legacyPackages.${system});
+    in
+    {
+      legacyPackages = eachSystem (pkgs: {
+        srcFromJson = pkgs.callPackage ./lib { };
+      });
 
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
+      packages = eachSystem (pkgs: {
+        default = pkgs.callPackage ./pkgs { };
+      });
 
-        legacyPackages.srcFromJson = pkgs.callPackage ./lib { };
-        packages.default = pkgs.callPackage ./pkgs { };
-
-        overlayAttrs = {
-          inherit (config.legacyPackages) srcFromJson;
-          nix-package-updater = config.packages.default;
-        };
-
+      overlays.default = final: prev: {
+        srcFromJson = prev.callPackage ./lib { };
+        nix-package-updater = prev.callPackage ./pkgs { };
       };
     };
 }
