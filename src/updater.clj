@@ -28,7 +28,7 @@
                         :body
                         (json/parse-string true)
                         :tag_name)]
-    (when (not= (:rev args) new-version)
+    (when (not= (or (:tag args) (:rev args)) new-version)
       new-version)))
 
 
@@ -55,9 +55,12 @@
            :owner 10
            :repo 11
            :rev 12
+           :tag 12
            :hash 13}]
-    (compare (get m a 1000)
-             (get m b 1000))))
+    ;; Break ties on the key name: a sorted map treats keys that compare
+    ;; equal as the same key, which merged unlisted keys into one.
+    (compare [(get m a 1000) (name a)]
+             [(get m b 1000) (name b)])))
 
 (defn update-src
   [src-file]
